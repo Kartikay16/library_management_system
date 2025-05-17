@@ -10,8 +10,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 def home_page(request):
     book_query_set = Books.objects.all()
-    books_dict = BooksSerializer(book_query_set,many=True)
-
     resp = []
 
     for book in book_query_set:
