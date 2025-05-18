@@ -28,32 +28,13 @@ def home_page(request):
     print("Called Homepage succesfully")
     return JsonResponse(resp,safe=False)
 
-
 @csrf_exempt
-def register(request):
-    if(request.method == 'GET'):
-        return HttpResponse("Welcome")
-    if(request.method == 'POST'):
-        username = request.POST.get('username')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+def add_book(request):
+    book_name = request.POST.get('name')
+    genre = request.POST.get('genre')
+    is_available = request.POST.get('is_available')
 
-        user = User.objects.create_user(username=username, email=email,password=password,first_name = first_name,last_name=last_name)
-        user.save()
-        return JsonResponse({'message':"User Inserted Succesfully"})
-    
-
-@csrf_exempt
-def login_it(request):
-    if(request.method == 'POST'):
-        user = authenticate(username = request.POST.get('username'), password = request.POST.get('password'))
-        print(user)
-        if user is not None:
-            login(request, user)
-            return HttpResponse("Login Succesfull")
-        else:
-            return HttpResponse("Login Failed")
+    book = Books.objects.create(name=book_name, genre=genre, is_available= is_available)
+    return HttpResponse("Success... Book added")
     
     
