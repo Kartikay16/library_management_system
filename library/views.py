@@ -30,11 +30,17 @@ def home_page(request):
 
 @csrf_exempt
 def add_book(request):
-    book_name = request.POST.get('name')
-    genre = request.POST.get('genre')
-    is_available = request.POST.get('is_available')
-
-    book = Books.objects.create(name=book_name, genre=genre, is_available= is_available)
-    return HttpResponse("Success... Book added")
+    active_user = request.user
+    qs = active_user.groups.all()
+    for group in qs:
+        if(group.name == "Librarian"):
+            print("API Access Permission granted")
+            book_name = request.POST.get('name')
+            genre = request.POST.get('genre')
+            is_available = request.POST.get('is_available')
+            book = Books.objects.create(name=book_name, genre=genre, is_available= is_available)
+            return HttpResponse("Success... Book added")
+        
+    return HttpResponse("You dont have the permission to access this API. Contact admin for more details")
     
     
