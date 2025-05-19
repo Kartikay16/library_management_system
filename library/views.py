@@ -42,5 +42,18 @@ def add_book(request):
             return HttpResponse("Success... Book added")
         
     return HttpResponse("You dont have the permission to access this API. Contact admin for more details")
+
+
+@csrf_exempt
+def add_author(request):
+    if(request.user.groups.all().filter(name = 'librarian').exists()):
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        Author.objects.create(first_name=first_name,last_name=last_name)
+        return HttpResponse("Author Added Succesfully")
+    else: 
+        return HttpResponse("Forbidden..Contact Admin")
+
+    
     
     
