@@ -10,6 +10,14 @@ from django.views.decorators.csrf import csrf_exempt
 
 def home_page(request):
     book_query_set = Books.objects.all()
+    filter_genre = request.GET.get('genre')
+    if(filter_genre != None):
+        book_query_set = book_query_set.filter(genre = filter_genre)
+    
+    filter_availability = request.GET.get('Available')
+    if(filter_availability != None):
+        book_query_set = book_query_set.filter(is_available = filter_availability)
+
     resp = []
 
     for book in book_query_set:
