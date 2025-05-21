@@ -1,12 +1,11 @@
 from django.shortcuts import render
 from django.http import JsonResponse,HttpResponse
-from .models import Books,Author
+from .models import Books,Author,Order
 from .serializer import BooksSerializer
 from django.contrib.auth.models import User,auth
 from django.contrib.auth import authenticate,login
 from django.views.decorators.csrf import csrf_exempt
-
-
+import json
 
 def home_page(request):
     book_query_set = Books.objects.all()
@@ -92,7 +91,18 @@ def edit_book(request):
             book.genre = request.POST.get('genre') 
         
         if(request.POST.get('is_available') != None):
-            book.is_available = request.POST.get('is_available') 
+            book.is_available = request.POST.get('is_available')
+
+        if(request.POST.get('add_authors') != None):
+            authors_to_be_added_str = request.POST.get('add_authors')
+            authors_to_be_added = json.loads(authors_to_be_added_str)
+            book.author.add(*authors_to_be_added)
+
+        if (request.POST.get('remove_authors') != None):
+            authors_to_be_removed_str = request.POST.get('remove_authors')
+            authors_to_be_removed = json.loads(authors_to_be_removed_str)
+            book.author.remove(*authors_to_be_removed)
+            
 
         book.save()
         return HttpResponse("Book updated")
@@ -128,7 +138,17 @@ def add_author(request):
         return HttpResponse("Author Added Succesfully")
     else: 
         return HttpResponse("Forbidden..Contact Admin")
+    
 
+@csrf_exempt
+def assign_book(request):
+
+    book_to_be_assigned  = request.POST.get("book_id")
+    book = Books.objects.get(id = book_to_be_assigned)
+    user_booking = request.POST.get("user_id")
+    user = User.objects.get(id = user_booking)
+    Order.objects.create(book = book , user = user)
+    return HttpResponse("Book issued to requested user succesfully")
     
     
     

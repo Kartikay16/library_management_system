@@ -7,5 +7,6 @@ urlpatterns = [
     path('author/add',views.add_author),
     path('author/get',views.get_author),
     path('book/edit',views.edit_book),
-    path('author/edit',views.edit_author)
+    path('author/edit',views.edit_author),
+    path('order',views.assign_book),
 ]

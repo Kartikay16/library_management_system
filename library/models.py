@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -12,3 +13,6 @@ class Author(models.Model):
     last_name = models.CharField(max_length=100)
     book = models.ManyToManyField(Books, related_name= 'author')
 
+class Order(models.Model):
+    book = models.ForeignKey(Books, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
