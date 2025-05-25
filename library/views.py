@@ -6,6 +6,7 @@ from django.contrib.auth.models import User,auth
 from django.contrib.auth import authenticate,login
 from django.views.decorators.csrf import csrf_exempt
 import json
+from datetime import date
 
 def home_page(request):
     book_query_set = Books.objects.all()
@@ -142,13 +143,71 @@ def add_author(request):
 
 @csrf_exempt
 def assign_book(request):
-
     book_to_be_assigned  = request.POST.get("book_id")
     book = Books.objects.get(id = book_to_be_assigned)
+
+    if(book.is_available == False):
+        return HttpResponse("Book Unavailable. Please try later")
+    
     user_booking = request.POST.get("user_id")
     user = User.objects.get(id = user_booking)
     Order.objects.create(book = book , user = user)
+    book.is_available = False
+    book.save()
+    booking_date = date.today()
     return HttpResponse("Book issued to requested user succesfully")
+
+@csrf_exempt
+def return_book(request):
+
+    if not request.user.is_authenticated:
+        return HttpResponse("Login Required to access this API")
     
+    active_user = request.user
+    book_id = request.POST.get('book_id')
+    book = Books.objects.get(id = book_id)
+    book_id = book.id
+    if(Order.objects.filter(book_id = book_id, user_id = active_user.id, return_date = None).exists()):
+        order = Order.objects.get(book_id = book_id, user_id = active_user.id, return_date = None)
+        order.return_date= date.today()
+        book.is_available = True
+        order.save()
+        book.save()
+        return HttpResponse("Book succesfully returned..Thanks")
+    else:
+        return HttpResponse("Error returning book. No such order found...")
+    
+
+def get_order_history(request):
+
+    if not request.user.is_authenticated:
+        return HttpResponse("Login to see order history")
+    
+    orders = Order.objects.filter(user_id = request.user.id)
+    print(orders)
+    resp= []
+    for order in orders:
+        details = {'book_name':order.book.name,'issue_date':order.issue_date,'return_date':order.return_date}
+        resp.append(details)
+    return HttpResponse(resp)
+
+@csrf_exempt
+def get_book_history(request):
+    book_id = request.POST.get("book_id")
+    orders = Order.objects.filter(book_id = book_id)
+    resp = []
+    for order in orders:
+        details = {"book_name":order.book.name, "borrower_name": order.user.username , "issue_date": order.issue_date, "return_date": order.return_date}
+        resp.append(details)
+    return HttpResponse(resp)
+
+
+    
+
+
+
+
+
+
     
     

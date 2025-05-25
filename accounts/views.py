@@ -39,9 +39,13 @@ def login_user(request):
     
 @csrf_exempt
 def logout_user(request):
-    logout(request)
-    print(request.user)
-    return HttpResponse("Logout Succesful")
+    if(request.user.is_authenticated):
+        print(request.user)
+        logout(request)
+        print(request.user)
+        return HttpResponse("Logout Succesful")
+    else:
+        return HttpResponse("No user Logged In")
     
 
 
