@@ -127,9 +127,6 @@ def edit_author(request):
         return HttpResponse("403 Forbidden to access the API. Contact admin")
         
 
-
-
-
 @csrf_exempt
 def add_author(request):
     if(request.user.groups.all().filter(name = 'librarian').exists()):
