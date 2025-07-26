@@ -26,11 +26,28 @@ SECRET_KEY = 'django-insecure-qc^4i=!6@)(g!f5gd-xu%h=0_@ryj@%v3erd3w7#5=+0t+r#(q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1']
-CORS_ALLOW_ALL_ORIGINS = True
+
+# SESSION_COOKIE_SAMESITE = 'Lax'
+# SESSION_COOKIE_SECURE = False
+
+# CSRF_COOKIE_SAMESITE = 'Lax'
+# CSRF_COOKIE_SECURE = False
+
+# ALLOWED_HOSTS = ['localhost','127.0.0.1']
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+# ]
+# CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_ALL_ORIGINS = True  # Only for development
+CORS_ALLOW_CREDENTIALS = True
+
+# Session settings
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = False  # Set to True in production
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 
-# Application definition
 
 INSTALLED_APPS = [
     'library.apps.LibraryConfig',

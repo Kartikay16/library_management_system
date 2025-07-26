@@ -27,6 +27,7 @@ def home_page(request):
 
     for book in book_query_set:
         book_entry = {}
+        book_entry['id'] = book.id
         book_entry['name'] = book.name
         book_entry['genre'] = book.genre
         book_entry['is_available'] = book.is_available
@@ -71,8 +72,9 @@ def add_book(request):
 
             book = Books.objects.create(name=book_name, genre=genre, is_available= is_available)
             print(author_id)
-            author = Author.objects.get(id = author_id)
-            book.author.add(author)
+            if(author_id != None):
+                author = Author.objects.get(id = author_id)
+                book.author.add(author)
 
             return HttpResponse("Success... Book added")
     return HttpResponse("You dont have the permission to access this API. Contact admin for more details")
@@ -144,21 +146,21 @@ def assign_book(request):
     book = Books.objects.get(id = book_to_be_assigned)
 
     if(book.is_available == False):
-        return HttpResponse("Book Unavailable. Please try later")
+        return JsonResponse({"message" :"Book Unavailable. Please try later" })
     
     user_booking = request.POST.get("user_id")
     user = User.objects.get(id = user_booking)
-    Order.objects.create(book = book , user = user)
     book.is_available = False
     book.save()
+    Order.objects.create(book = book , user = user)
     booking_date = date.today()
-    return HttpResponse("Book issued to requested user succesfully")
+    return JsonResponse({"message" :"Book Issued Succesfully" })
 
 @csrf_exempt
 def return_book(request):
 
     if not request.user.is_authenticated:
-        return HttpResponse("Login Required to access this API")
+        return JsonResponse({"message" :"Login to return the book" })
     
     active_user = request.user
     book_id = request.POST.get('book_id')
@@ -170,9 +172,9 @@ def return_book(request):
         book.is_available = True
         order.save()
         book.save()
-        return HttpResponse("Book succesfully returned..Thanks")
+        return JsonResponse({"message" :"Book Returned succesfully" })
     else:
-        return HttpResponse("Error returning book. No such order found...")
+        return JsonResponse({"message" :"Error returning book... No such order found" })
     
 
 def get_order_history(request):
@@ -197,6 +199,16 @@ def get_book_history(request):
         details = {"book_name":order.book.name, "borrower_name": order.user.username , "issue_date": order.issue_date, "return_date": order.return_date}
         resp.append(details)
     return HttpResponse(resp)
+
+@csrf_exempt
+def get_role(request):
+    user = request.user
+    groups = list(user.groups.values_list('name', flat=True))
+    return JsonResponse({
+        'username': user.username,
+        'roles': groups,
+        'id':user.id
+    })
 
 
     

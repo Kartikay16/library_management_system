@@ -12,4 +12,5 @@ urlpatterns = [
     path('return',views.return_book),
     path('order/history',views.get_order_history),
     path('book/history',views.get_book_history),
+    path('getrole',views.get_role),
 ]
