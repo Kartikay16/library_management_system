@@ -7,5 +7,6 @@ WORKDIR /library_management_system
 
 COPY . /library_management_system
 
-# CMD ["bash","-c", "echo 'executing cmd cammands' && python manage.py makemigrations && python manage.py migrate" ]
+EXPOSE 8000
+CMD [ "python","manage.py","runserver" ]
 
